@@ -7,6 +7,7 @@ export default function Home() {
 	const [id, setId] = useState("");
 	const [myQueue, setMyQueue] = useState(null); // Nomor antrian customer
 	const [latestQueue, setLatestQueue] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
 		// Cek apakah ada data di localStorage
@@ -49,10 +50,12 @@ export default function Home() {
 
 	const takeQueue = async () => {
 		try {
+			setIsLoading(true);
 			const response = await axios.post("/api/take", {
 				id,
 				latestPusher: latestQueue,
 			});
+			setIsLoading(false);
 			setMyQueue(response.data.number);
 			// localStorage.setItem("id", id);
 			// localStorage.setItem("nomor", latestQueue);
@@ -70,12 +73,12 @@ export default function Home() {
 	}, [latestQueue]);
 
 	return (
-		<div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
-			<div className="w-[90%] md:w-[500px] bg-sky-400 text-sky-950 p-3 rounded-lg border border-sky-500 mb-3 text-center">
+		<div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[90%] md:w-[500px]">
+			<div className="w-full bg-sky-400 text-sky-950 p-3 rounded-lg border border-sky-500 mb-3 text-center m-3 mx-auto">
 				<b>INFORMASI!</b> Tunjukkan halaman ini pada staff, untuk mengkonfirmasi
 				bahwa nomor antrian benar!
 			</div>
-			<div className="w-[90%] md:w-[500px] bg-white rounded-lg p-3 border flex flex-col gap-5">
+			<div className="w-full md:w-[500px] bg-white rounded-lg p-3 border flex flex-col gap-5 mx-auto">
 				<h1 className="text-2xl font-bold mb-3 text-center">
 					Sistem Antrian Customer
 				</h1>
