@@ -13,14 +13,6 @@ export async function POST(request) {
 		const body = await request.json();
 		const { latestPusher } = body;
 
-		// Validasi input
-		if (typeof latestPusher !== "number" || latestPusher < 0) {
-			return NextResponse.json({
-				status: 400,
-				message: "latestPusher harus berupa angka positif.",
-			});
-		}
-
 		// Ambil entri antrian maksimum berdasarkan tanggal hari ini
 		const maxQueueEntry = await prisma.queue.findFirst({
 			where: {

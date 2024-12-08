@@ -68,6 +68,7 @@ export default function Home() {
 			});
 			setIsLoading(false);
 			setMyQueue(response.data.number);
+			console.log(response.data);
 		} catch (err) {
 			setIsLoading(false);
 			console.error("Error taking queue:", err.message);
