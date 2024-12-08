@@ -14,9 +14,6 @@ export async function GET() {
 					lte: endOfDay(new Date()), // Akhir hari
 				},
 			},
-			orderBy: {
-				createdAt: "desc", // Ambil data terbaru
-			},
 		});
 
 		// Jika tidak ada data, kembalikan respons dengan pesan khusus
@@ -24,15 +21,13 @@ export async function GET() {
 			return NextResponse.json({
 				status: 203,
 				message: "Belum ada nomor antrian untuk hari ini",
-				id: nomorAntrianHariIni.id,
-				nomor: null,
+				nomor: 0,
 			});
 		}
 
 		return NextResponse.json({
 			status: 200,
 			message: "OK",
-			id: nomorAntrianHariIni.id,
 			nomor: nomorAntrianHariIni.number,
 		});
 	} catch (err) {

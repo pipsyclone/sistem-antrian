@@ -6,10 +6,10 @@ import { startOfDay, endOfDay } from "date-fns";
 const prisma = new PrismaClient();
 
 const pusher = new Pusher({
-	appId: "1876851",
-	key: "ebe2ac36546d3e8dadf5",
-	secret: "934f8d5f9cca665468fc",
-	cluster: "ap1",
+	appId: process.env.NEXT_PUBLIC_PUSHER_APPID,
+	key: process.env.NEXT_PUBLIC_PUSHER_KEY,
+	secret: process.env.NEXT_PUBLIC_PUSHER_SECRET,
+	cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
 	useTLS: true,
 });
 

@@ -1,49 +1,58 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { startOfDay, endOfDay } from "date-fns";
 
 const prisma = new PrismaClient();
 
 export async function POST(request) {
+	const now = new Date();
+	const start = startOfDay(now);
+	const end = endOfDay(now);
+
 	try {
 		const body = await request.json();
-		const { id, latestPusher } = body;
+		const { latestPusher } = body;
 
-		// Get the most recent queue entry based on the provided id
-		const maxNumber = await prisma.queue.findFirst({
-			where: { id },
+		// Validasi input
+		if (typeof latestPusher !== "number" || latestPusher < 0) {
+			return NextResponse.json({
+				status: 400,
+				message: "latestPusher harus berupa angka positif.",
+			});
+		}
+
+		// Ambil entri antrian maksimum berdasarkan tanggal hari ini
+		const maxQueueEntry = await prisma.queue.findFirst({
+			where: {
+				createdAt: {
+					gte: start,
+					lte: end,
+				},
+			},
 			orderBy: { number: "desc" },
 		});
 
-		if (maxNumber) {
-			// If there is an existing entry and latestPusher is less than maxNumber.number
-			if (maxNumber.number > latestPusher) {
-				const newNumber = maxNumber.number + 1;
+		// Tentukan nomor antrian baru
+		const maxNumber = maxQueueEntry?.number || 0; // Default ke 0 jika tidak ada entri
+		const newNumber = Math.max(latestPusher, maxNumber) + 1;
 
-				await prisma.queue.create({
-					data: {
-						id,
-						number: newNumber,
-					},
-				});
-
-				return NextResponse.json({ number: newNumber });
-			}
-
-			// If latestPusher is not less than maxNumber.number, return the current maxNumber
-			return NextResponse.json({ number: maxNumber.number });
-		}
-
-		// If no entry exists for the given id, create the first one
-		const newNumber = latestPusher + 1;
+		// Tambahkan entri antrian baru
 		await prisma.queue.create({
 			data: {
-				id,
 				number: newNumber,
+				createdAt: now,
 			},
 		});
 
-		return NextResponse.json({ number: newNumber });
+		return NextResponse.json({
+			status: 200,
+			message: "Nomor antrian berhasil dibuat.",
+			number: newNumber,
+		});
 	} catch (err) {
-		return NextResponse.json({ status: 500, message: err.message });
+		return NextResponse.json({
+			status: 500,
+			message: `Terjadi kesalahan: ${err.message}`,
+		});
 	}
 }

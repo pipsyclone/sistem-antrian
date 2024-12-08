@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,18 +17,16 @@ model QueueRunning {
   id        String   @id @default(cuid())
   number    Int
   createdAt DateTime @unique @default(now())
-  Queue     Queue[]
 
   @@map("queuerunning")
 }
 
 model Queue {
-  id        String
-  number    Int      @default(1)
-  createdAt DateTime @unique @default(now())
-  status    String   @default("waiting") // "waiting", "in-progress", "completed"
-
-  Queue QueueRunning @relation(fields: [id], references: [id])
+  id         String    @id @default(cuid())
+  number     Int       @default(1)
+  start_time DateTime? @unique
+  end_time   DateTime? @unique
+  createdAt  DateTime  @unique @default(now())
 
   @@map("queue")
 }
